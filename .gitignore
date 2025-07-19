@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+npm-debug.log
+
+# IDE/editor
+.vscode/
+*.swp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+*.zip
+
+# Ambiente
+.env
