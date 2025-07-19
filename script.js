@@ -275,24 +275,24 @@ function gameLoop() {
   enemies.forEach((enemy, i) => {
   enemy.update();
 
-  if (enemy.health <= 0) {
-    money += 25;
-    score += 100;
-    enemies.splice(i, 1);
-    return;
-  }
-
   if (enemy.waypointIndex >= waypoints.length) {
     lives--;
     enemies.splice(i, 1);
     if (lives <= 0) {
-      gameOver = true;
+        gameOver = true;
     }
-    return;
-  }
+    return; // esci: il nemico è arrivato alla fine
+}
 
-  enemy.draw();
-});
+if (enemy.health <= 0) {
+    money += 25;
+    score += 100;
+    enemies.splice(i, 1);
+    return; // esci: il nemico è stato ucciso
+}
+
+enemy.draw(); // disegna solo i nemici vivi e in campo
+
 
   // Aggiorna torri
   towers.forEach(tower => {
