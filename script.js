@@ -172,10 +172,6 @@ function startWave() {
   waveInProgress = true;
 }
 
-function placeTower(x, y) {
-  towers.push(new Tower(x, y));
-}
-
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -291,7 +287,8 @@ if (enemy.health <= 0) {
     return; // esci: il nemico è stato ucciso
 }
 
-enemy.draw(); // disegna solo i nemici vivi e in campo
+enemy.draw();
+}); // disegna solo i nemici vivi e in campo
 
 
   // Aggiorna torri
