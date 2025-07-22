@@ -1,5 +1,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+let TILE_SIZE = 40;
+let GRID_WIDTH = 20;
+let GRID_HEIGHT = 15;
+
 /**** RESIZE ****/
 function resizeCanvas() {
   const aspectRatio = 4 / 3;
@@ -14,7 +19,9 @@ function resizeCanvas() {
     canvas.height = maxWidth / aspectRatio;
   }
 
-  TILE_SIZE = canvas.width / 20; // aggiorna scala
+  TILE_SIZE = canvas.width / 20;
+  GRID_WIDTH = 20;
+  GRID_HEIGHT = Math.floor(canvas.height / TILE_SIZE);
   updateGridSize();
 }
 
@@ -25,6 +32,7 @@ function updateGridSize() {
 
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
+/**** FINE RESIZE ****/
 
 let selectedTowerType = "basic"; // default
 
@@ -48,50 +56,31 @@ const towerCosts = {
   rapid: 150
 };
 
-const TILE_SIZE = 40;
-const GRID_WIDTH = canvas.width / TILE_SIZE;
-const GRID_HEIGHT = canvas.height / TILE_SIZE;
-
-const waypoints = [
-  () => ({ x: 0, y: canvas.height * 0.33 }),
-  () => ({ x: canvas.width * 0.25, y: canvas.height * 0.33 }),
-  () => ({ x: canvas.width * 0.25, y: canvas.height * 0.66 }),
-  () => ({ x: canvas.width * 0.75, y: canvas.height * 0.66 }),
-  () => ({ x: canvas.width * 0.75, y: canvas.height * 0.15 }),
-  () => ({ x: canvas.width, y: canvas.height * 0.15 }),
-];
-
-function getWaypoints() {
-  return waypoints.map(fn => fn());
-}
-
-
-
-
 let enemies = [];
 let towers = [];
 let bullets = [];
 
 class Enemy {
   constructor() {
+    this.waypoints = getWaypoints();
     this.waypointIndex = 0;
-    this.x = waypoints[0].x;
-    this.y = waypoints[0].y;
+    this.x = this.waypoints[0].x;
+    this.y = this.waypoints[0].y;
     this.size = TILE_SIZE / 2;
     this.speed = 1;
     this.health = 100;
   }
 
   update() {
-    const target = waypoints[this.waypointIndex];
+    const target = this.waypoints[this.waypointIndex];
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (dist < 1) {
       this.waypointIndex++;
-      if (this.waypointIndex >= waypoints.length) {
-        this.health = 0; // segna come morto
+      if (this.waypointIndex >= this.waypoints.length) {
+        this.health = 0;
       }
     } else {
       this.x += (dx / dist) * this.speed;
@@ -101,15 +90,11 @@ class Enemy {
 
   draw() {
   ctx.fillStyle = "#d63c3c";
-  ctx.fillRect(this.x, this.y, this.size, this.size);
-
-  // bordo pixel
-  ctx.strokeStyle = "#5a1212";
-  ctx.strokeRect(this.x, this.y, this.size, this.size);
-
-  // barra salute
-  ctx.fillStyle = "limegreen";
-  ctx.fillRect(this.x, this.y - 5, this.size * (this.health / 100), 3);
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.strokeStyle = "#5a1212"; 
+    ctx.strokeRect(this.x, this.y, this.size, this.size);
+    ctx.fillStyle = "limegreen"; // bordo
+    ctx.fillRect(this.x, this.y - 5, this.size * (this.health / 100), 3);
   }
 }
 
@@ -185,6 +170,16 @@ class Bullet {
 
 // FUNCTIONS & EVENTLISTENERS
 
+function getWaypoints() {
+  return [
+    { x: 0, y: canvas.height * 0.33 },
+    { x: canvas.width * 0.3, y: canvas.height * 0.33 },
+    { x: canvas.width * 0.3, y: canvas.height * 0.7 },
+    { x: canvas.width * 0.9, y: canvas.height * 0.7 },
+    { x: canvas.width, y: canvas.height * 0.7 }
+  ];
+}
+
 function updateUi() {
   document.getElementById("moneyDisplay").textContent = `💰 ${money}`;
   document.getElementById("livesDisplay").textContent = `❤️ ${lives}`;
@@ -194,7 +189,8 @@ function updateUi() {
 }
 
 function spawnEnemy() {
-  enemies.push(new Enemy());
+  const dynamicWaypoints = getWaypoints();
+  enemies.push(new Enemy(dynamicWaypoints));
 }
 
 function startWave() {
@@ -206,8 +202,11 @@ function startWave() {
 
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const scaleX = canvas.width / rect.width;   // scala X tra coordinate canvas interne e dimensioni visualizzate
+  const scaleY = canvas.height / rect.height; // scala Y
+
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
 
   const snappedX = Math.floor(x / TILE_SIZE) * TILE_SIZE + TILE_SIZE / 2;
   const snappedY = Math.floor(y / TILE_SIZE) * TILE_SIZE + TILE_SIZE / 2;
@@ -228,6 +227,9 @@ function placeTower(x, y, type = "basic") {
 
 
 function drawPath() {
+  const waypoints = getWaypoints(); 
+
+  ctx.lineCap = "round"; // aggiungi questo
   ctx.strokeStyle = "#444";
   ctx.lineWidth = TILE_SIZE;
   ctx.beginPath();
@@ -249,17 +251,19 @@ function drawPath() {
 }
 
  function drawBackgroundGrid() {
+  const tileWidth = canvas.width / GRID_WIDTH;
+  const tileHeight = canvas.height / GRID_HEIGHT;
+
   for (let x = 0; x < GRID_WIDTH; x++) {
     for (let y = 0; y < GRID_HEIGHT; y++) {
       ctx.fillStyle = (x + y) % 2 === 0 ? "#1a1a1a" : "#222";
-      ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
     }
   }
 }
 
 // GAMELOOOOOOOP
 function gameLoop() {
-
     if (gameOver) {
         ctx.fillStyle = "rgba(0,0,0,0.7)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -299,28 +303,27 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackgroundGrid();
     drawPath();
-  // Aggiorna nemici
-  enemies.forEach((enemy, i) => {
-  enemy.update();
+    // Aggiorna nemici
+    for (let i = enemies.length - 1; i >= 0; i--) {
+    const enemy = enemies[i];
+    enemy.update();
 
-  if (enemy.waypointIndex >= waypoints.length) {
-    lives--;
-    enemies.splice(i, 1);
-    if (lives <= 0) {
-        gameOver = true;
+    if (enemy.waypointIndex >= enemy.waypoints.length) {
+      lives--;
+      enemies.splice(i, 1);
+      if (lives <= 0) gameOver = true;
+      continue; // passa al prossimo
     }
-    return; // esci: il nemico è arrivato alla fine
-}
 
-if (enemy.health <= 0) {
-    money += 25;
-    score += 100;
-    enemies.splice(i, 1);
-    return; // esci: il nemico è stato ucciso
-}
+    if (enemy.health <= 0) {
+      money += 25;
+      score += 100;
+      enemies.splice(i, 1);
+      continue;
+    }
 
-enemy.draw();
-}); // disegna solo i nemici vivi e in campo
+    enemy.draw();
+    }// disegna solo i nemici vivi e in campo
 
 
   // Aggiorna torri
@@ -330,17 +333,15 @@ enemy.draw();
   });
 
   // Aggiorna proiettili
-  bullets.forEach((bullet, i) => {
-    bullet.update();
-    if (bullet.destroyed) {
-      bullets.splice(i, 1);
-    } else {
-      bullet.draw();
-    }
-
-
-  });
-
+  for (let i = bullets.length - 1; i >= 0; i--) {
+  const bullet = bullets[i];
+  bullet.update();
+  if (bullet.destroyed) {
+    bullets.splice(i, 1);
+  } else {
+    bullet.draw();
+  }
+}
   requestAnimationFrame(gameLoop);
 }
 
