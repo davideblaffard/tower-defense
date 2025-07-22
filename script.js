@@ -1,5 +1,31 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+/**** RESIZE ****/
+function resizeCanvas() {
+  const aspectRatio = 4 / 3;
+  const maxWidth = window.innerWidth;
+  const maxHeight = window.innerHeight;
+
+  if (maxWidth / maxHeight > aspectRatio) {
+    canvas.height = maxHeight;
+    canvas.width = maxHeight * aspectRatio;
+  } else {
+    canvas.width = maxWidth;
+    canvas.height = maxWidth / aspectRatio;
+  }
+
+  TILE_SIZE = canvas.width / 20; // aggiorna scala
+  updateGridSize();
+}
+
+function updateGridSize() {
+  GRID_WIDTH = Math.floor(canvas.width / TILE_SIZE);
+  GRID_HEIGHT = Math.floor(canvas.height / TILE_SIZE);
+}
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
 let selectedTowerType = "basic"; // default
 
 document.querySelectorAll(".ui button").forEach(btn => {
@@ -22,19 +48,25 @@ const towerCosts = {
   rapid: 150
 };
 
-
-const waypoints = [
-  { x: 0, y: 200 },
-  { x: 200, y: 200 },
-  { x: 200, y: 400 },
-  { x: 600, y: 400 },
-  { x: 600, y: 100 },
-  { x: 800, y: 100 }
-];
-
 const TILE_SIZE = 40;
 const GRID_WIDTH = canvas.width / TILE_SIZE;
 const GRID_HEIGHT = canvas.height / TILE_SIZE;
+
+const waypoints = [
+  () => ({ x: 0, y: canvas.height * 0.33 }),
+  () => ({ x: canvas.width * 0.25, y: canvas.height * 0.33 }),
+  () => ({ x: canvas.width * 0.25, y: canvas.height * 0.66 }),
+  () => ({ x: canvas.width * 0.75, y: canvas.height * 0.66 }),
+  () => ({ x: canvas.width * 0.75, y: canvas.height * 0.15 }),
+  () => ({ x: canvas.width, y: canvas.height * 0.15 }),
+];
+
+function getWaypoints() {
+  return waypoints.map(fn => fn());
+}
+
+
+
 
 let enemies = [];
 let towers = [];
