@@ -1,0 +1,55 @@
+.stage {
+  width: min(96vw, calc((100vh - 220px) * 4 / 3), 980px);
+  max-height: calc(100vh - 220px);
+  aspect-ratio: 4 / 3;
+  border-radius: 22px;
+  padding: 10px;
+  background:
+    linear-gradient(135deg, rgba(11, 15, 18, 0.9), rgba(20, 27, 33, 0.95));
+  border: 1px solid rgba(77, 255, 184, 0.35);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  border: 3px solid rgba(77, 255, 184, 0.6);
+  background-color: #0f1114;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.stage::before,
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.stage::before {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+.stage::after {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 255, 255, 0.04) 1px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}

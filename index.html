@@ -4,22 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tower Defense</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/hud.css"/>
+  <link rel="stylesheet" href="css/stage.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-    <div class="ui">
-        <span id="moneyDisplay">💰 300</span>
-        <span id="livesDisplay">❤️ 10</span>
-        <span id="scoreDisplay">🏆 0</span>
-        <span id="waveDisplay">🌊 Wave: 0</span>
-        <br><br>
-
-        <button data-type="basic">Torre Base (100)</button>
-        <button data-type="rapid">Torre Veloce (150)</button>
+  <div class="page">
+    <div class="rotate-hint" role="status" aria-live="polite">
+      Rotate your phone for the best experience.
     </div>
-<canvas id="gameCanvas"></canvas>
-<script src="script.js"></script>
+    <header class="hud">
+      <div class="brand">
+        <div class="title">Tower Defense</div>
+        <div class="subtitle">Command your grid. Hold the line.</div>
+      </div>
+
+      <button class="hud-toggle" type="button" aria-expanded="true">
+        Toggle HUD
+      </button>
+
+      <div id="toast" class="toast" aria-live="polite"></div>
+
+      <div class="hud-top hud-content">
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-label">Money</span>
+            <span id="moneyDisplay" class="stat-value">💰 300</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Lives</span>
+            <span id="livesDisplay" class="stat-value">❤️ 10</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Score</span>
+            <span id="scoreDisplay" class="stat-value">🏆 0</span>
+          </div>
+          <div class="stat stat-wide">
+            <span class="stat-label">Wave</span>
+            <span id="waveDisplay" class="stat-value">🌊 Wave: 0</span>
+          </div>
+        </div>
+
+        <div class="stats-compact" aria-label="Compact stats">
+          <span id="moneyCompact">💰 300</span>
+          <span id="livesCompact">❤️ 10</span>
+          <span id="scoreCompact">🏆 0</span>
+          <span id="waveCompact">🌊 0</span>
+        </div>
+
+        <div class="wave-progress">
+          <div class="wave-progress__header">
+            <span class="wave-progress__title">Wave Progress</span>
+            <span id="waveProgressText" class="wave-progress__value">0%</span>
+          </div>
+          <div class="wave-progress__track">
+            <div id="waveProgressFill" class="wave-progress__fill"></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="legend__title">Enemy Types</span>
+          <div class="legend__items">
+            <div class="legend__item"><span class="legend__swatch legend__swatch--basic"></span> Basic (B)</div>
+            <div class="legend__item"><span class="legend__swatch legend__swatch--fast"></span> Fast (F)</div>
+            <div class="legend__item"><span class="legend__swatch legend__swatch--tank"></span> Tank (T)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls hud-content build-bar">
+        <button class="tower-btn tower-btn--basic" data-type="basic" aria-label="Torre Base">
+          <span class="tower-btn__icon"></span>
+          <span class="tower-btn__label">Torre Base (100)</span>
+        </button>
+        <button class="tower-btn tower-btn--rapid" data-type="rapid" aria-label="Torre Veloce">
+          <span class="tower-btn__icon"></span>
+          <span class="tower-btn__label">Torre Veloce (150)</span>
+        </button>
+      </div>
+
+      <div class="tower-panel hud-content">
+        <div class="tower-panel__header">
+          <span class="tower-panel__title">Tower Upgrade</span>
+          <div class="tower-panel__meta">
+            <span id="towerStatus" class="tower-panel__status">Select a tower</span>
+            <button id="towerDeselect" class="tower-panel__close" type="button" aria-label="Deselect tower">
+              Deselect
+            </button>
+          </div>
+        </div>
+        <div id="towerStats" class="tower-panel__stats">No tower selected.</div>
+        <div class="tower-panel__actions">
+          <button id="upgradeDamage" type="button">Damage +5 (75)</button>
+          <button id="upgradeRange" type="button">Range +10 (75)</button>
+          <button id="upgradeSpeed" type="button">Speed +5% (75)</button>
+        </div>
+      </div>
+
+      
+    </header>
+
+    <div class="stage">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+  </div>
+
+  <script src="js/globals.js" defer></script>
+  <script src="js/utils.js" defer></script>
+  <script src="js/path.js" defer></script>
+  <script src="js/grid.js" defer></script>
+  <script src="js/entities.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/input.js" defer></script>
+  <script src="js/game.js" defer></script>
 </body>
 </html>
