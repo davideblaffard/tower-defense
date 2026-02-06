@@ -6,6 +6,14 @@
   }
 }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  .is-ios .safari-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 900px) {
   body {
     padding: 12px 10px 16px;
